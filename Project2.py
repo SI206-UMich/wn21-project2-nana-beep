@@ -21,7 +21,7 @@ def get_titles_from_search_results(filename):
     filepath = os.path.join(root_path, filename)
 
     #open the file
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding="utf-8") as f:
         search_results_text = f.read()
 
     #create soup object
@@ -64,20 +64,21 @@ def get_search_links():
     
     url = "https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc"
     resp = requests.get(url)
-    soup = BeautifulSoup(resp.text, 'html.parser')
-    newList = []
-    left = soup.find("div", class_ = "leftContainer")
-    table = left.find("table", class_ = "tableList")
-    rows = table.find_all("tr")
-    starter = "https://www.goodreads.com"
+    if resp.ok:
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        newList = []
+        left = soup.find("div", class_ = "leftContainer")
+        table = left.find("table", class_ = "tableList")
+        rows = table.find_all("tr")
+        starter = "https://www.goodreads.com"
 
-    for row in rows[0:10]:
+        for row in rows[0:10]:
         # link = row.find("a", href = True)
         # new_starter = starter + link['href']
-        link = row.find("a").get("href", None).strip()
-        new_starter = starter + link
-        newList.append(new_starter)
-    return newList
+            link = row.find("a").get("href", None).strip()
+            new_starter = starter + link
+            newList.append(new_starter)
+        return newList
     # print (newList)
     
 
@@ -97,30 +98,31 @@ def get_book_summary(book_url):
     """
     resp = requests.get(book_url)
     # print(book_url)
-    soup = BeautifulSoup(resp.text, 'html.parser')
+    if resp.ok:
+        soup = BeautifulSoup(resp.text, 'html.parser')
     # newList = []
-    body = soup.find("div", class_ = "content")
-    main = body.find("div", class_ = "mainContentContainer")
+        body = soup.find("div", class_ = "content")
+        main = body.find("div", class_ = "mainContentContainer")
     # print(main)
-    content = main.find("div", class_= "mainContent")
-    left = content.find("div", class_ = "leftContainer")
+        content = main.find("div", class_= "mainContent")
+        left = content.find("div", class_ = "leftContainer")
     # print(left)
-    column = left.find("div", id = "topcol")
+        column = left.find("div", id = "topcol")
     
-    new_column = column.find("div", id = "metacol")
+        new_column = column.find("div", id = "metacol")
 
-    bookTitle = new_column.find("h1", id = "bookTitle").text.strip()
+        bookTitle = new_column.find("h1", id = "bookTitle").text.strip()
 
-    author_id = new_column.find("div", id = "bookAuthors")
-    authorName = author_id.find('a', class_ = 'authorName').text.strip()
+        author_id = new_column.find("div", id = "bookAuthors")
+        authorName = author_id.find('a', class_ = 'authorName').text.strip()
     
 
-    number = new_column.find("div", id = "details")
-    pages = number.find('span', itemprop = 'numberOfPages')
+        number = new_column.find("div", id = "details")
+        pages = number.find('span', itemprop = 'numberOfPages')
   
-    pagesNumber = re.search(r'\b\d+\b', pages.text.strip()).group(0)
+        pagesNumber = re.search(r'\b\d+\b', pages.text.strip()).group(0)
 
-    a_tup = (bookTitle, authorName, int(pagesNumber))
+        a_tup = (bookTitle, authorName, int(pagesNumber))
     
     return a_tup
     
