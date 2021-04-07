@@ -124,8 +124,8 @@ def get_book_summary(book_url):
 
         a_tup = (bookTitle, authorName, int(pagesNumber))
     
-    return a_tup
-    
+        return a_tup
+    return ("","",0)
 
 
 def summarize_best_books(filepath):
